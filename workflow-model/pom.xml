@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>io.samancore</groupId>
+    <artifactId>workflow</artifactId>
+    <version>0.0.1</version>
+  </parent>
+  <groupId>io.samancore.workflow</groupId>
+  <artifactId>workflow-model</artifactId>
+  <properties>
+    <maven.compiler.release>21</maven.compiler.release>
+
+    <jakarta.validation-api.version>3.1.0</jakarta.validation-api.version>
+    <common-model.version>1.0.0-SNAPSHOT</common-model.version>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>io.samancore</groupId>
+      <artifactId>common-model</artifactId>
+      <version>${common-model.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.validation</groupId>
+      <artifactId>jakarta.validation-api</artifactId>
+      <version>${jakarta.validation-api.version}</version>
+    </dependency>
+  </dependencies>
+</project>
