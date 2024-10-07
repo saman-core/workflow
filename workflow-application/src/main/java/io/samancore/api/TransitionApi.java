@@ -5,7 +5,6 @@ import io.samancore.service.TransitionService;
 import io.smallrye.mutiny.Uni;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
-import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -59,7 +58,7 @@ public class TransitionApi {
     @GET
     @Path("/get-all-initial-by-product/{productId}")
     @RolesAllowed({"official"})
-    public Uni<List<Transition>> getAllInitialByProduct(@PathParam("productId") Long productId) {
+    public Uni<List<Transition>> getAllByStateInitialAndProduct(@PathParam("productId") Long productId) {
         log.debugf("TransitionApi.getAllByStatusFrom statusFromId: %s", productId);
         return service.getAllByStateInitialAndProduct(productId);
     }
@@ -67,7 +66,7 @@ public class TransitionApi {
     @GET
     @Path("/get-all-initial-by-product-and-roles/{productId}")
     @RolesAllowed({"official"})
-    public Uni<List<Transition>> getAllInitialByProductAndRoles(@PathParam("productId") Long productId) {
+    public Uni<List<Transition>> getAllByStateInitialAndProductAndRoles(@PathParam("productId") Long productId) {
         log.debugf("TransitionApi.getAllInitialByProductAndRoles productId: %s", productId);
         var userRolesJsonArray = ((JsonObject) jwt.getClaim(REALM_ACCESS)).getJsonArray(ROLES);
         return service.getAllByStateInitialAndProductAndRoles(productId, userRolesJsonArray);

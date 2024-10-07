@@ -3,9 +3,9 @@ package io.samancore.client.rest;
 import io.samancore.client.TransitionClient;
 import io.samancore.client.rest.microprofile.TransitionRestClient;
 import io.samancore.model.Transition;
+import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.json.JsonArray;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 
@@ -22,37 +22,37 @@ public class TransitionRestClientWrapper implements TransitionClient {
     TransitionRestClient service;
 
     @Override
-    public Transition getByProductAndTransition(Long productId, String transitionId) {
+    public Uni<Transition> getByProductAndTransition(Long productId, String transitionId) {
         log.debugf("TransitionRestClientWrapper.validateCanBeApplied productId: %d stateId: %s transitionId: %s", transitionId);
         return service.getByProductAndTransition(productId, transitionId);
     }
 
     @Override
-    public List<Transition> getAllByProductAndStateFrom(Long productId, String stateFromId) {
+    public Uni<List<Transition>> getAllByProductAndStateFrom(Long productId, String stateFromId) {
         log.debugf("TransitionRestClientWrapper.getAllByProductAndStateFrom productId: %d stateFromId: %s", productId, stateFromId);
         return service.getAllByProductAndStateFrom(productId, stateFromId);
     }
 
     @Override
-    public List<Transition> getAllByProductAndStateFromAndRoles(Long productId, String stateFromId, JsonArray userRolesJsonArray) {
+    public Uni<List<Transition>> getAllByProductAndStateFromAndRoles(Long productId, String stateFromId) {
         log.debugf("TransitionRestClientWrapper.validateCanBeApplied productId: %d stateFromId: %s", productId, stateFromId);
         return service.getAllByProductAndStateFromAndRoles(productId, stateFromId);
     }
 
     @Override
-    public List<Transition> getAllByStateInitialAndProduct(Long productId) {
+    public Uni<List<Transition>> getAllByStateInitialAndProduct(Long productId) {
         log.debugf("TransitionRestClientWrapper.validateCanBeApplied productId: %d", productId);
         return service.getAllByStateInitialAndProduct(productId);
     }
 
     @Override
-    public List<Transition> getAllByStateInitialAndProductAndRoles(Long productId, JsonArray userRolesJsonArray) {
+    public Uni<List<Transition>> getAllByStateInitialAndProductAndRoles(Long productId) {
         log.debugf("TransitionRestClientWrapper.validateCanBeApplied productId: %d", productId);
         return service.getAllByStateInitialAndProductAndRoles(productId);
     }
 
     @Override
-    public Boolean validateCanBeApplied(Long productId, String stateId, String transitionId) {
+    public Uni<Boolean> validateCanBeApplied(Long productId, String stateId, String transitionId) {
         log.debugf("TransitionRestClientWrapper.validateCanBeApplied productId: %d stateId: %s transitionId: %s", stateId, transitionId);
         return service.validateCanBeApplied(productId, stateId, transitionId);
     }

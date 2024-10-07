@@ -1,9 +1,10 @@
 package io.samancore.client;
 
 import io.samancore.model.State;
+import io.smallrye.mutiny.Uni;
 
 public interface StateClient {
-    State getByProductAndStateId(Long productId, String stateId);
+    Uni<State> getByProductAndStateId(Long productId, String stateId);
 
-    State getInitialByProductId(Long productId);
+    Uni<State> getInitialByProductId(Long productId);
 }

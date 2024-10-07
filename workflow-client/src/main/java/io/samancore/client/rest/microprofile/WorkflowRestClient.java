@@ -11,7 +11,7 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import java.util.List;
 
 @ApplicationScoped
-@RegisterRestClient(configKey = "cde-workflow-api")
+@RegisterRestClient(configKey = "workflow-api")
 @RegisterClientHeaders
 @Path("/workflows")
 @Produces(MediaType.APPLICATION_JSON)

@@ -3,6 +3,7 @@ package io.samancore.client.rest;
 import io.samancore.client.StateClient;
 import io.samancore.client.rest.microprofile.StateRestClient;
 import io.samancore.model.State;
+import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -19,13 +20,13 @@ public class StateRestClientWrapper implements StateClient {
     StateRestClient service;
 
     @Override
-    public State getByProductAndStateId(Long productId, String stateId) {
+    public Uni<State> getByProductAndStateId(Long productId, String stateId) {
         log.debugf("StateRestClientWrapper.getByProductAndStateId productId: %d stateId: %s", productId, stateId);
         return service.getByProductAndStateId(productId, stateId);
     }
 
     @Override
-    public State getInitialByProductId(Long productId) {
+    public Uni<State> getInitialByProductId(Long productId) {
         log.debugf("StateRestClientWrapper.getInitialByProductId productid %d", productId);
         return service.getInitialByProductId(productId);
     }

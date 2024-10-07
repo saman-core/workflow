@@ -1,21 +1,20 @@
 package io.samancore.client;
 
 import io.samancore.model.Transition;
-import jakarta.json.JsonArray;
+import io.smallrye.mutiny.Uni;
 
 import java.util.List;
 
 public interface TransitionClient {
+    Uni<Transition> getByProductAndTransition(Long productId, String transitionId);
 
-    Transition getByProductAndTransition(Long productId, String transitionId);
+    Uni<List<Transition>> getAllByProductAndStateFrom(Long productId, String stateFromId);
 
-    List<Transition> getAllByProductAndStateFrom(Long productId, String stateFromId);
+    Uni<List<Transition>> getAllByProductAndStateFromAndRoles(Long productId, String stateFromId);
 
-    List<Transition> getAllByProductAndStateFromAndRoles(Long productId, String stateFromId, JsonArray userRolesJsonArray);
+    Uni<List<Transition>> getAllByStateInitialAndProduct(Long productId);
 
-    List<Transition> getAllByStateInitialAndProduct(Long productId);
+    Uni<List<Transition>> getAllByStateInitialAndProductAndRoles(Long productId);
 
-    List<Transition> getAllByStateInitialAndProductAndRoles(Long productId, JsonArray userRolesJsonArray);
-
-    Boolean validateCanBeApplied(Long productId, String stateId, String transitionId);
+    Uni<Boolean> validateCanBeApplied(Long productId, String stateId, String transitionId);
 }
