@@ -2,13 +2,12 @@ package io.samancore.model.type;
 
 import java.util.Arrays;
 
-
 public enum CellType {
     LINK("standard.Link"),
     CIRCLE("standard.Circle"),
     RECTANGLE("standard.Rectangle");
 
-    String description;
+    final String description;
 
     CellType(String description) {
         this.description = description;

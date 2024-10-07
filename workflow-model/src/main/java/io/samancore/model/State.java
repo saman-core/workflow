@@ -8,7 +8,6 @@ import lombok.extern.jackson.Jacksonized;
 
 import java.util.List;
 
-
 @Value
 @Jacksonized
 @Builder(

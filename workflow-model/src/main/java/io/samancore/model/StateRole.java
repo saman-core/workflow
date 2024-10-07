@@ -14,7 +14,6 @@ import lombok.extern.jackson.Jacksonized;
 )
 public class StateRole {
     Long id;
-
     String stateId;
     @NotNull
     String role;

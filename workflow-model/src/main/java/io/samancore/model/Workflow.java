@@ -13,13 +13,8 @@ import lombok.extern.jackson.Jacksonized;
         toBuilder = true
 )
 public class Workflow {
-
     Long id;
-
     String description;
-
     @NotNull
     Long productId;
-
-
 }

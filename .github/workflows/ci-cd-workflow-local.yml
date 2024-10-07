@@ -7,6 +7,7 @@ env:
   ACTOR: saman-core
   IMAGE_APP_NAME: workflow
   APP_NAME: workflow
+  MIN_SCALE: 0
 
 jobs:
   build_contenizer:
@@ -26,9 +27,23 @@ jobs:
           native-image-job-reports: 'true'
           version: '23.1.4.0-Final'
 
+      - name: Set settings.xml
+        env:
+          SETTINGS_XML: ${{ secrets.SETTINGS_XML }}
+          TOKEN: ${{ secrets.GIT_TOKEN }}
+        run: |
+          base64 -d -i <<<$(echo $SETTINGS_XML) > settings.xml
+          sed -i -e 's/OWNER/${{ env.ACTOR }}/g' -e 's/TOKEN/${{ env.TOKEN }}/g' ./settings.xml
+
       - name: Build native app
         run: |
-          ./mvnw package -Dnative -DskipTests
+          ./mvnw -s ./settings.xml install -DskipTests
+          ./mvnw -s ./settings.xml -pl workflow-application package -Pnative -DskipTests
+
+      - name: Deploy app
+        run: |
+          ./mvnw -s ./settings.xml -pl workflow-client deploy -DskipTests
+          ./mvnw -s ./settings.xml -pl workflow-model deploy -DskipTests
 
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v3
@@ -47,7 +62,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./
-          file: ./src/main/docker/Dockerfile
+          file: ./workflow-application/src/main/docker/Dockerfile
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.ACTOR }}/${{ env.IMAGE_APP_NAME }}:${{ github.sha }}
 
@@ -70,7 +85,7 @@ jobs:
         run: |
           base64 -d -i <<<$(echo $BASE64) > ./kubeconfig
           export KUBECONFIG=./kubeconfig
-          sed -i -e 's/CONTAINER_IMAGE/${{ env.REGISTRY }}\/${{ env.ACTOR }}\/${{ env.IMAGE_APP_NAME }}:${{ github.sha }}/g' -e 's/APP_VERSION/${{ github.run_number }}/g' -e 's/APP_NAME/${{ env.APP_NAME }}/g' -e 's/DEPLOY_HASH/${{ github.sha }}/g' -e 's/N_REPLICA/${{ env.N_REPLICA }}/g' ./kubernetes/deployment-local.yml
+          sed -i -e 's/CONTAINER_IMAGE/${{ env.REGISTRY }}\/${{ env.ACTOR }}\/${{ env.IMAGE_APP_NAME }}:${{ github.sha }}/g' -e 's/APP_VERSION/${{ github.run_number }}/g' -e 's/APP_NAME/${{ env.APP_NAME }}/g' -e 's/DEPLOY_HASH/${{ github.sha }}/g' -e 's/MIN_SCALE/${{ env.MIN_SCALE }}/g' ./kubernetes/deployment-local.yml
           kubectl apply -f ./kubernetes/deploy-secret.yml -n api --insecure-skip-tls-verify
           kubectl delete -f ./kubernetes/deployment-local.yml -n api --insecure-skip-tls-verify || true
           kubectl apply -f ./kubernetes/deployment-local.yml -n api --insecure-skip-tls-verify
