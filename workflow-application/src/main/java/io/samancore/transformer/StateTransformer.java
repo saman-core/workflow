@@ -67,7 +67,7 @@ public class StateTransformer extends GenericTransformer<StateEntity, State> {
     public List<StateEntity> toEntityList(List<State> models) {
         try {
             log.debugf("StatusTransformer.toEntityList entities.size: %s", models.size());
-            return models.stream().map(this::toEntity).collect(Collectors.toList());
+            return models.stream().map(this::toEntity).toList();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw ExceptionHandler.throwNotFoundOrLocal(TechnicalExceptionsEnum.TRANSFORMER_OBJECT_ERROR, e);

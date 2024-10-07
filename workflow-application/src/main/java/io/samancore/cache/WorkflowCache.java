@@ -27,8 +27,7 @@ public class WorkflowCache {
 
     private Map<Long, DefaultDirectedGraph<State, Transition>> workflowMapByProduct;
 
-
-    public Boolean init() {
+    public void init() {
         log.debug("WorkflowCache.init");
         workflowMapByProduct = new HashMap<>();
         var transitions = transitionRepository.getAll();
@@ -45,7 +44,6 @@ public class WorkflowCache {
             });
             workflowMapByProduct.put(key, graph);
         });
-        return Boolean.TRUE;
     }
 
     public DefaultDirectedGraph<State, Transition> getWorkflowGraph(Long productId) {

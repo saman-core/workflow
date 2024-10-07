@@ -6,6 +6,7 @@ import io.smallrye.mutiny.Uni;
 import java.util.List;
 
 public interface TransitionClient {
+
     Uni<Transition> getByProductAndTransition(Long productId, String transitionId);
 
     Uni<List<Transition>> getAllByProductAndStateFrom(Long productId, String stateFromId);

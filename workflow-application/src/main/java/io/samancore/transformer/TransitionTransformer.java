@@ -75,7 +75,6 @@ public class TransitionTransformer extends GenericTransformer<TransitionEntity, 
         }
     }
 
-
     public TransitionEntity copyToAttached(TransitionEntity detached, TransitionEntity attached) {
         try {
             log.debugf("TransitionTransformer.copyToAttached detached: %s attached: %s", detached, attached);

@@ -94,7 +94,7 @@ public class WorkFlowServiceImpl implements WorkFlowService {
                 .setStateRoles(cell.getRoles() != null ? cell.getRoles()
                         .stream()
                         .map(role -> getBuildStateRole(cell, role))
-                        .collect(Collectors.toList())
+                        .toList()
                         : null)
                 .build();
         validateModel(model);
@@ -116,7 +116,7 @@ public class WorkFlowServiceImpl implements WorkFlowService {
         return request.getCells().stream()
                 .filter(cell -> CellType.getByDescription(cell.getType()).equals(CellType.LINK))
                 .map(this::getBuildTransition)
-                .map(transition -> transitionTransformer.toEntity(transition)).collect(Collectors.toList());
+                .map(transition -> transitionTransformer.toEntity(transition)).toList();
     }
 
     private Transition getBuildTransition(Cell cell) {
@@ -131,7 +131,7 @@ public class WorkFlowServiceImpl implements WorkFlowService {
                 .setTransitionRoles(cell.getRoles()
                         .stream()
                         .map(role -> getBuildTransitionRole(cell, role))
-                        .collect(Collectors.toList()))
+                        .toList())
                 .build();
         validateModel(model);
         return model;

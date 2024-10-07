@@ -17,7 +17,6 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class TransitionApi {
-
     private static final String REALM_ACCESS = "realm_access";
     private static final String ROLES = "roles";
 

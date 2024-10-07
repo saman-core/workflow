@@ -20,12 +20,12 @@ import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class WorkflowRepositoryReactive implements WorkflowRepository {
-
     public static final String DELETE_STATE_ENTITY = "DELETE FROM StateEntity s WHERE s.id not in (:entityIds)";
     public static final String DELETE_TRANSITION_ENTITY = "DELETE FROM TransitionEntity t WHERE t.id not in (:entityIds)";
     public static final String DELETE_STATE_ROLE_ENTITY = "DELETE FROM StateRoleEntity s WHERE s.stateId not in (:entityIds) or s.stateId is null";
     public static final String DELETE_TRANSITION_ROLE_ENTITY = "DELETE FROM TransitionRoleEntity t WHERE t.transitionId not in (:entityIds) or t.transitionId is null";
     public static final String PARAMETER_KEY_ENTITY_IDS = "entityIds";
+
     @Inject
     Logger log;
 
@@ -139,6 +139,4 @@ public class WorkflowRepositoryReactive implements WorkflowRepository {
         });
         return transitionEntityList;
     }
-
-
 }

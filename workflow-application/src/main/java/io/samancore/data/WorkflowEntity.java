@@ -28,5 +28,4 @@ public class WorkflowEntity {
 
     @Column(nullable = false, unique = true)
     private Long productId;
-
 }

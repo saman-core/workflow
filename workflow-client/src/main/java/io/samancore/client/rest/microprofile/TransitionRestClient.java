@@ -41,6 +41,4 @@ public interface TransitionRestClient {
     @GET
     @Path("/validate-can-be-applied/{productId}/{stateId}/{transitionId}")
     Uni<Boolean> validateCanBeApplied(@PathParam("productId") Long productId, @PathParam("stateId") String stateId, @PathParam("transitionId") String transitionId);
-
-    ;
 }

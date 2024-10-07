@@ -15,7 +15,6 @@ public class TransitionRolesTransformer extends GenericTransformer<TransitionRol
     @Inject
     Logger log;
 
-
     public TransitionRoleEntity toEntity(TransitionRole model) {
         try {
             log.debugf("TransitionRolesTransformer.toEntity model: %s", model);
