@@ -9,7 +9,7 @@
     <modules>
         <module>job</module>
         <module>app</module>
-        <module>json_diagram</module>
+        <module>json-diagram</module>
     </modules>
 
     <properties>
