@@ -18,6 +18,9 @@ public class StateEntity {
 
     private String category;
 
+    @Column(name = "product_name")
+    private String productName;
+
     @Column(name = "is_initial")
     private Boolean isInitial;
 

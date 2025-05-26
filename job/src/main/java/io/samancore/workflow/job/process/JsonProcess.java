@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Collections;
@@ -34,18 +35,39 @@ public class JsonProcess {
 
     @Transactional
     public void run() {
-        log.info("INIT load json.");
-        try (InputStream inputStream = new FileInputStream(jsonFilePath)) {
-            var erDiagram = objectMapper.readValue(inputStream, WorkflowDiagram.class);
+        log.info("INIT Graph loaded");
 
+        File folder = new File(jsonFilePath);
+        File[] files = folder.listFiles((dir, name) -> name.endsWith(".json"));
+
+        if (files != null) {
             deleteAllTransitions();
             deleteAllStates();
+
+            for (File file : files) {
+                String fileName = file.getName();
+                int dotIndex = fileName.lastIndexOf('.');
+                String productName = fileName.substring(0, dotIndex);
+
+                log.infof("Product Graph %s", productName);
+                processFile(file, productName);
+            }
+            log.info("All JSON files processed successfully.");
+        } else {
+            log.warnf("No JSON files found in the specified directory: %s", jsonFilePath);
+        }
+    }
+
+    public void processFile(File file, String productName) {
+        try (InputStream inputStream = new FileInputStream(file)) {
+            var erDiagram = objectMapper.readValue(inputStream, WorkflowDiagram.class);
 
             Map<String, StateEntity> entityMap = new HashMap<>();
             erDiagram.getCells().stream()
                     .filter(cell -> "standard.Circle".equals(cell.getType()))
                     .forEach(cell -> {
                         StateEntity state = new StateEntity();
+                        state.setProductName(productName);
                         state.setId(UUID.fromString(cell.getId()));
                         state.setName(cell.getName());
                         state.setCategory(StateCategoryType.INITIAL.getValue());
@@ -53,12 +75,13 @@ public class JsonProcess {
                         state.setStateRoles(Collections.emptyList());
                         persistState(state);
                         entityMap.put(cell.getId(), state);
-                        log.infof("Persist state %s", state.getName());
+                        log.infof("Persist Product %s, Vertex: %s", productName, state.getName());
                     });
             erDiagram.getCells().stream()
                     .filter(cell -> "standard.Rectangle".equals(cell.getType()))
                     .forEach(cell -> {
                         StateEntity state = new StateEntity();
+                        state.setProductName(productName);
                         state.setId(UUID.fromString(cell.getId()));
                         state.setName(cell.getName());
                         state.setCategory(cell.getStateType().getValue());
@@ -66,25 +89,26 @@ public class JsonProcess {
                         state.setStateRoles(cell.getRoles());
                         persistState(state);
                         entityMap.put(cell.getId(), state);
-                        log.infof("Persist state %s", state.getName());
+                        log.infof("Persist Product %s, Vertex: %s", productName, state.getName());
                     });
 
             erDiagram.getCells().stream()
                     .filter(cell -> "standard.Link".equals(cell.getType()))
                     .forEach(link -> {
                         TransitionEntity relationship = new TransitionEntity();
+                        relationship.setProductName(productName);
                         relationship.setId(UUID.fromString(link.getId()));
                         relationship.setName(link.getName());
                         relationship.setSourceState(entityMap.get(link.getSource().getId()));
                         relationship.setTargetState(entityMap.get(link.getTarget().getId()));
                         relationship.setAllowedRoles(link.getRoles());
                         persistTransition(relationship);
-                        log.infof("Persist relationship %s", relationship.getName());
+                        log.infof("Persist Product %s, relationship: %s", productName, relationship.getName());
                     });
-            log.info("Graph loaded successfully.");
+            log.infof("Product Graph loaded %s", productName);
         } catch (Exception e) {
-            log.error("Error loading Graph", e);
-            throw new IllegalStateException("Error loading Graph");
+            log.errorf("Error loading Graph Product", productName);
+            throw new IllegalArgumentException("Error loading Graph ", e);
         }
     }
 

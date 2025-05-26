@@ -16,6 +16,9 @@ public class TransitionEntity {
 
     private String name;
 
+    @Column(name = "product_name")
+    private String productName;
+
     @ManyToOne
     @JoinColumn(name = "source_state_id")
     private StateEntity sourceState;
