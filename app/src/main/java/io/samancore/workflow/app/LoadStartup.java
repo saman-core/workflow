@@ -2,6 +2,7 @@ package io.samancore.workflow.app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.runtime.Startup;
+import io.samancore.workflow.app.util.GraphCache;
 import io.samancore.workflow.json_diagram.WorkflowDiagram;
 import io.samancore.workflow.model.State;
 import io.samancore.workflow.model.StateCategoryType;
@@ -11,13 +12,14 @@ import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.samancore.workflow.app.util.GraphCache.GRAPH;
+import static io.samancore.workflow.app.util.GraphCache.GRAPHS;
 
 @Startup
 @ApplicationScoped
@@ -31,7 +33,29 @@ public class LoadStartup {
     public void init() {
         log.info("INIT Graph loaded");
 
-        try (InputStream inputStream = new FileInputStream(jsonFilePath)) {
+        File folder = new File(jsonFilePath);
+        File[] files = folder.listFiles((dir, name) -> name.endsWith(".json"));
+
+        if (files != null) {
+            for (File file : files) {
+                String fileName = file.getName();
+                int dotIndex = fileName.lastIndexOf('.');
+                String productName = fileName.substring(0, dotIndex);
+
+                log.infof("Product Graph %s", productName);
+
+                GRAPHS.put(productName, GraphCache.emptyGraph());
+
+                processFile(file, productName);
+            }
+            log.info("All JSON files processed successfully.");
+        } else {
+            log.warnf("No JSON files found in the specified directory: %s", jsonFilePath);
+        }
+    }
+
+    private void processFile(File file, String productName) {
+        try (InputStream inputStream = new FileInputStream(file)) {
             var objectMapper = new ObjectMapper();
             var erDiagram = objectMapper.readValue(inputStream, WorkflowDiagram.class);
 
@@ -47,8 +71,8 @@ public class LoadStartup {
                                 Collections.emptyList()
                         );
                         entityMap.put(cell.getId(), entityModel);
-                        GRAPH.addVertex(entityModel);
-                        log.infof("Vertex: %s", entityModel.name());
+                        GRAPHS.get(productName).addVertex(entityModel);
+                        log.infof("Product %s, Vertex: %s", productName, entityModel.name());
                     });
 
             erDiagram.getCells().stream()
@@ -62,8 +86,8 @@ public class LoadStartup {
                                 cell.getRoles()
                         );
                         entityMap.put(cell.getId(), entityModel);
-                        GRAPH.addVertex(entityModel);
-                        log.infof("Vertex: %s", entityModel.name());
+                        GRAPHS.get(productName).addVertex(entityModel);
+                        log.infof("Product %s, Vertex: %s", productName, entityModel.name());
                     });
 
             erDiagram.getCells().stream()
@@ -81,14 +105,15 @@ public class LoadStartup {
                                     link.getRoles(),
                                     link.getData()
                             );
-                            GRAPH.addEdge(source, target, relationship);
-                            log.infof("Edge: %s", relationship.name());
+                            GRAPHS.get(productName).addEdge(source, target, relationship);
+                            log.infof("Product %s, Edge: %s", productName, relationship.name());
                         }
                     });
 
-            log.info("Graph loaded successfully.");
+            log.infof("Product Graph loaded %s", productName);
         } catch (Exception e) {
-            log.error("Error loading Graph", e);
+            log.errorf("Error loading Graph Product", productName);
+            throw new IllegalArgumentException("Error loading Graph ", e);
         }
     }
 }

@@ -30,6 +30,16 @@ jobs:
           repository: saman-core/product-repository
           path: product-repository
 
+      - name: Create json folder
+        run: |
+          mkdir -p products-list
+          for product_dir in product-repository/${{ env.MODULE }}/products/*; do
+            if [ -d "$product_dir" ] && [ -f "$product_dir/workflow.json" ]; then
+              product_name=$(basename "$product_dir")
+              cp "$product_dir/workflow.json" "products-list/${product_name}.json"
+            fi
+          done
+
       - name: Set Kubectl
         uses: azure/setup-kubectl@v4
 
@@ -53,6 +63,6 @@ jobs:
           sed -i -e 's/CONTAINER_IMAGE/${{ env.REGISTRY }}\/${{ env.ACTOR }}\/${{ env.IMAGE_APP_NAME }}:${{ github.sha }}/g' -e 's/CONTAINER_JOB_IMAGE/${{ env.REGISTRY }}\/${{ env.ACTOR }}\/${{ env.IMAGE_APP_NAME }}-job:${{ github.sha }}/g' -e 's/APP_VERSION/${{ github.run_number }}/g' -e 's/APP_NAME/${{ env.APP_NAME }}/g' -e 's/DEPLOY_HASH/${{ github.sha }}/g' -e 's/N_REPLICA/${{ env.N_REPLICA }}/g' ./kubernetes/deployment-local.yml
           kubectl apply -f ./kubernetes/deploy-secret.yml -n api --insecure-skip-tls-verify
           kubectl delete secret ${{ env.APP_NAME }}-json-secret -n api --insecure-skip-tls-verify || true
-          kubectl create secret generic ${{ env.APP_NAME }}-json-secret --from-file=product-repository/$(echo $MODULE)/er.json -n api --insecure-skip-tls-verify
+          kubectl create secret generic ${{ env.APP_NAME }}-json-secret --from-file=products-list -n api --insecure-skip-tls-verify
           kubectl delete -f ./kubernetes/deployment-local.yml -n api --insecure-skip-tls-verify || true
           kubectl apply -f ./kubernetes/deployment-local.yml -n api --insecure-skip-tls-verify
